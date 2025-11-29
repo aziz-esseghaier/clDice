@@ -1,4 +1,4 @@
-from skimage.morphology import skeletonize, skeletonize_3d
+from skimage.morphology import skeletonize
 import numpy as np
 
 def cl_score(v, s):
@@ -24,10 +24,11 @@ def clDice(v_p, v_l):
     Returns:
         [float]: [cldice metric]
     """
-    if len(v_p.shape)==2:
+    if v_p.ndim in (2, 3):
         tprec = cl_score(v_p,skeletonize(v_l))
         tsens = cl_score(v_l,skeletonize(v_p))
-    elif len(v_p.shape)==3:
-        tprec = cl_score(v_p,skeletonize_3d(v_l))
-        tsens = cl_score(v_l,skeletonize_3d(v_p))
-    return 2*tprec*tsens/(tprec+tsens)
+        return 2*tprec*tsens/(tprec+tsens)
+    else:
+        raise ValueError(
+            f"Predicted image must be 2D or 3D, but got array with {v_p.ndim} dimensions"
+        )
